@@ -1,11 +1,17 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Shark from "../components/Shark.vue";
+import ToDoList from "../components/ToDoList.vue";
 
 const routes = [
   {
     path: "/shark",
     name: "Shark",
     component: Shark,
+  },
+  {
+    path: "/ToDoList",
+    name: "ToDoList",
+    component: ToDoList,
   },
 ];
 
