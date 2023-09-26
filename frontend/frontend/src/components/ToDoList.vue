@@ -22,9 +22,7 @@
             <thead>
               <tr>
                 <!-- Table header cells -->
-                <th scope="col">Name</th>
-                <th scope="col">Category</th>
-                <th scope="col">Location</th>
+                <th scope="col">Task</th>
                 <th scope="col">Deadline</th>
                 <th scope="col">Completed?</th>
                 <th scope="col">Actions</th>
@@ -35,8 +33,6 @@
                 <td>A</td>
                 <td>B</td>
                 <td>C</td>
-                <td>D</td>
-                <td>E</td>
                 <td>
                   <div class="btn-group" role="group">
                     <button type="button" class="btn btn-info btn-sm">
@@ -55,3 +51,31 @@
     </div>
   </div>
 </template>
+
+<script>
+import axios from "axios";
+export default {
+  data() {
+    return {
+      tasks: [],
+    };
+  },
+
+  methods: {
+    getTasks() {
+      const path = "http://localhost:5000/tasks";
+      axios
+        .get(path)
+        .then((res) => {
+          this.tasks = res.data.tasks;
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    },
+  },
+  created() {
+    this.getTasks();
+  },
+};
+</script>

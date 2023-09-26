@@ -16,5 +16,36 @@ def greetings():
 def shark():
     return("Shark")
 
+TASKS = [
+    {
+        'task':'wash dishes',
+        'deadline':'tonight',
+        'completed':False,
+    },
+    {
+        'task':'clean room',
+        'deadline':'tomorrow',
+        'completed':False,
+    },
+    {
+        'task':'pay rent',
+        'deadline':'friday',
+        'completed':True,
+    },
+    {
+        'task':'take out trash',
+        'deadline':'tuesday',
+        'completed':True,
+    }
+]
+
+# The GET route handler
+@app.route('/tasks', methods=['GET'])
+def all_tasks():
+    return jsonify({
+        'tasks': TASKS,
+        'status': 'success',
+    })
+
 if __name__ == "__main__":
     app.run(debug=True)
