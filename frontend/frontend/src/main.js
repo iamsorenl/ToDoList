@@ -1,15 +1,9 @@
-import Vue from "vue";
+import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
-// install bootstrap first
 import "bootstrap/dist/css/bootstrap.css";
-// Importing the bootstrapvue library
-import BootstrapVue from "bootstrap-vue";
+//import BootstrapVue from "bootstrap-vue";
 
-Vue.config.productionTip = false;
-Vue.use(BootstrapVue);
+//.use(BootstrapVue);
 
-new Vue({
-  router,
-  render: (h) => h(App),
-}).$mount("#app");
+createApp(App).use(router).mount("#app");
