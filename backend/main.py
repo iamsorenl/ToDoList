@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -40,12 +40,20 @@ TASKS = [
 ]
 
 # The GET route handler
-@app.route('/tasks', methods=['GET'])
+@app.route('/tasks', methods=['GET', 'POST'])
 def all_tasks():
-    return jsonify({
-        'tasks': TASKS,
-        'status': 'success',
-    })
+    response_object = {'status':'success'}
+    if request.method == "POST":
+        post_data = request.get_json()
+        TASKS.append({
+            'task': post_data.get('task'),
+            'deadline': post_data.get('deadline'),
+            'completed': post_data.get('completed')})
+        response_object['message'] = 'Task Added'
+    else:
+        response_object['tasks'] = TASKS
+    return jsonify(response_object)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
