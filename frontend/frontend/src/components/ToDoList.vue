@@ -29,10 +29,13 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>A</td>
-                <td>B</td>
-                <td>C</td>
+              <tr v-for="(task, index) in tasks" :key="index">
+                <td>{{ task.task }}</td>
+                <td>{{ task.deadline }}</td>
+                <td>
+                  <span v-if="task.completed">Yes</span>
+                  <span v-else>No</span>
+                </td>
                 <td>
                   <div class="btn-group" role="group">
                     <button type="button" class="btn btn-info btn-sm">
