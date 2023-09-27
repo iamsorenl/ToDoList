@@ -10,7 +10,12 @@
       />
       <div class="row">
         <div class="col-sm-12">
-          <p class="display-4">To Do List 🗒️</p>
+          <h1
+            class="text-center bg-primary text-white"
+            style="border-radius: 10px"
+          >
+            To Do List 🗒️
+          </h1>
           <hr />
           <br />
 
@@ -49,6 +54,12 @@
               </tr>
             </tbody>
           </table>
+          <footer
+            class="bg-primary text-white text-center"
+            style="border-radius: 10px"
+          >
+            Copyright &copy;. All Rights Reserved 2023.
+          </footer>
         </div>
       </div>
     </div>
