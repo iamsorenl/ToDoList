@@ -62,6 +62,55 @@
           </footer>
         </div>
       </div>
+      <!-- First Modal -->
+      <b-modal
+        ref="addTaskModal"
+        id="task-modal"
+        title="Add a new task"
+        hide-backdrop
+        hide-footer
+      >
+        <b-form @submit="onSubmit" @reset="onReset" class="w-100">
+          <b-form-group
+            id="form-task-group"
+            label="Task:"
+            label-for="form-task-input"
+          >
+            <b-form-input
+              id="form-task-input"
+              type="text"
+              v-model="addTaskForm.task"
+              required
+              placeholder="Enter Task"
+            >
+            </b-form-input>
+          </b-form-group>
+          <b-form-group
+            id="form-deadline-group"
+            label="Deadline:"
+            label-for="form-deadline-input"
+          >
+            <b-form-input
+              id="form-deadline-input"
+              type="text"
+              v-model="addTaskForm.deadline"
+              required
+              placeholder="Enter Deadline"
+            >
+            </b-form-input>
+          </b-form-group>
+          <b-form-group id="form-completed-group">
+            <b-form-checkbox-group
+              v-model="addTaskForm.completed"
+              id="form-checks"
+            >
+              <b-form-checkbox value="true">Completed?</b-form-checkbox>
+            </b-form-checkbox-group>
+          </b-form-group>
+          <button type="submit" variant="primary">Submit</button>
+          <button type="reset" variant="primary">Reset</button>
+        </b-form>
+      </b-modal>
     </div>
   </div>
 </template>
