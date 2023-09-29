@@ -1,114 +1,59 @@
 <template>
   <div class="jumbotron vertical-center">
     <div class="container">
-      <!-- Bootswatch CDN -->
-      <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/lumen/bootstrap.min.css"
-        integrity="sha384-GzaBcW6yPIfhF+6VpKMjxbTx6tvR/yRd/yJub90CqoIn2Tz4rRXlSpTFYMKHCifX"
-        crossorigin="anonymous"
-      />
-      <div class="row">
-        <div class="col-sm-12">
-          <h1
-            class="text-center bg-primary text-white"
-            style="border-radius: 10px"
-          >
-            To Do List 🗒️
-          </h1>
-          <hr />
-          <br />
+      <h1 class="text-center bg-primary text-white" style="border-radius: 10px">
+        To Do List 🗒️
+      </h1>
+      <hr />
+      <br />
 
-          <!-- Alert Message -->
-          <button type="button" class="btn btn-success btn-sm">Add</button>
-          <br /><br />
-          <table class="table table-hover">
-            <!-- Table Head -->
-            <thead>
-              <tr>
-                <!-- Table header cells -->
-                <th scope="col">Task</th>
-                <th scope="col">Deadline</th>
-                <th scope="col">Completed?</th>
-                <th scope="col">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(task, index) in tasks" :key="index">
-                <td>{{ task.task }}</td>
-                <td>{{ task.deadline }}</td>
-                <td>
-                  <span v-if="task.completed">Yes</span>
-                  <span v-else>No</span>
-                </td>
-                <td>
-                  <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-info btn-sm">
-                      Update
-                    </button>
-                    <button type="button" class="btn btn-danger btn-sm">
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <footer
-            class="bg-primary text-white text-center"
-            style="border-radius: 10px"
-          >
-            Copyright &copy;. All Rights Reserved 2023.
-          </footer>
-        </div>
-      </div>
-      <!-- First Modal -->
-      <b-modal
-        ref="addTaskModal"
-        id="task-modal"
-        title="Add a new task"
-        hide-backdrop
-        hide-footer
+      <!-- Add Task Button -->
+      <b-button variant="success" @click="showAddTaskModal">Add</b-button>
+      <br /><br />
+
+      <!-- Task List Table -->
+      <b-table
+        striped
+        hover
+        :items="tasks"
+        :fields="tableFields"
+        caption-top
+      ></b-table>
+
+      <!-- Footer -->
+      <footer
+        class="bg-primary text-white text-center"
+        style="border-radius: 10px"
       >
-        <b-form @submit="onSubmit" @reset="onReset" class="w-100">
-          <b-form-group
-            id="form-task-group"
-            label="Task:"
-            label-for="form-task-input"
-          >
+        Copyright &copy; All Rights Reserved 2023.
+      </footer>
+
+      <!-- Add Task Modal -->
+      <b-modal v-model="addTaskModal" title="Add a new task" hide-footer>
+        <b-form @submit="onSubmit" @reset="onReset">
+          <b-form-group label="Task:" label-for="form-task-input">
             <b-form-input
               id="form-task-input"
-              type="text"
               v-model="addTaskForm.task"
               required
               placeholder="Enter Task"
-            >
-            </b-form-input>
+            ></b-form-input>
           </b-form-group>
-          <b-form-group
-            id="form-deadline-group"
-            label="Deadline:"
-            label-for="form-deadline-input"
-          >
+          <b-form-group label="Deadline:" label-for="form-deadline-input">
             <b-form-input
               id="form-deadline-input"
-              type="text"
               v-model="addTaskForm.deadline"
               required
               placeholder="Enter Deadline"
-            >
-            </b-form-input>
+            ></b-form-input>
           </b-form-group>
-          <b-form-group id="form-completed-group">
-            <b-form-checkbox-group
-              v-model="addTaskForm.completed"
-              id="form-checks"
-            >
-              <b-form-checkbox value="true">Completed?</b-form-checkbox>
-            </b-form-checkbox-group>
+          <b-form-group>
+            <b-form-checkbox v-model="addTaskForm.completed" value="true">
+              Completed?
+            </b-form-checkbox>
           </b-form-group>
-          <button type="submit" variant="primary">Submit</button>
-          <button type="reset" variant="primary">Reset</button>
+          <b-button type="submit" variant="primary">Submit</b-button>
+          <b-button type="reset" variant="primary">Reset</b-button>
         </b-form>
       </b-modal>
     </div>
@@ -117,14 +62,27 @@
 
 <script>
 import axios from "axios";
+
 export default {
   data() {
     return {
       tasks: [],
+      addTaskForm: {
+        task: "",
+        deadline: "",
+        completed: [],
+      },
+      addTaskModal: false,
+      tableFields: [
+        { key: "task", label: "Task" },
+        { key: "deadline", label: "Deadline" },
+        { key: "completed", label: "Completed?" },
+        { key: "actions", label: "Actions" },
+      ],
     };
   },
-
   methods: {
+    // GET function
     getTasks() {
       const path = "http://localhost:5000/tasks";
       axios
@@ -135,6 +93,44 @@ export default {
         .catch((err) => {
           console.error(err);
         });
+    },
+    // POST function
+    addTask(payLoad) {
+      const path = "http://localhost:5000/tasks";
+      axios
+        .post(path, payLoad)
+        .then(() => {
+          this.getTasks();
+          this.addTaskModal = false; // Close the modal
+          this.initForm();
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    },
+    initForm() {
+      this.addTaskForm.task = "";
+      this.addTaskForm.deadline = "";
+      this.addTaskForm.completed = [];
+    },
+    onSubmit(e) {
+      e.preventDefault();
+      let completed = false;
+      if (this.addTaskForm.completed.includes("true")) {
+        completed = true;
+      }
+      const payload = {
+        task: this.addTaskForm.task,
+        deadline: this.addTaskForm.deadline,
+        completed: completed,
+      };
+      this.addTask(payload);
+    },
+    showAddTaskModal() {
+      this.addTaskModal = true;
+    },
+    onReset() {
+      this.initForm();
     },
   },
   created() {
