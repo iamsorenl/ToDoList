@@ -6,19 +6,23 @@
       </h1>
       <hr />
       <br />
-
       <!-- Add Task Button -->
-      <b-button variant="success" @click="showAddTaskModal">Add</b-button>
+      <b-button variant="success" @click="showAddTaskModal">Add Task</b-button>
       <br /><br />
 
       <!-- Task List Table -->
-      <b-table
-        striped
-        hover
-        :items="tasks"
-        :fields="tableFields"
-        caption-top
-      ></b-table>
+      <b-table striped hover :items="tasks" :fields="tableFields" caption-top>
+        <template #cell(actions)="data">
+          <div class="btn-group" role="group">
+            <b-button variant="info" @click="editTask(data.item)">
+              Update
+            </b-button>
+            <b-button variant="danger" @click="deleteTask(data.item.id)">
+              Delete
+            </b-button>
+          </div>
+        </template>
+      </b-table>
 
       <!-- Footer -->
       <footer
@@ -52,8 +56,37 @@
               Completed?
             </b-form-checkbox>
           </b-form-group>
-          <b-button type="submit" variant="primary">Submit</b-button>
-          <b-button type="reset" variant="primary">Reset</b-button>
+          <b-button type="submit" variant="outline-success">Submit</b-button>
+          <b-button type="reset" variant="outline-primary">Reset</b-button>
+        </b-form>
+      </b-modal>
+
+      <!-- Update Task Modal -->
+      <b-modal v-model="editTaskModal" title="Edit Task" hide-footer>
+        <b-form @submit="onSubmitUpdate" @reset="onResetUpdate">
+          <b-form-group label="Task:" label-for="form-task-edit-input">
+            <b-form-input
+              id="form-task-edit-input"
+              v-model="editTaskForm.task"
+              required
+              placeholder="Enter Task"
+            ></b-form-input>
+          </b-form-group>
+          <b-form-group label="Deadline:" label-for="form-deadline-edit-input">
+            <b-form-input
+              id="form-deadline-edit-input"
+              v-model="editTaskForm.deadline"
+              required
+              placeholder="Enter Deadline"
+            ></b-form-input>
+          </b-form-group>
+          <b-form-group>
+            <b-form-checkbox v-model="editTaskForm.completed" value="true">
+              Completed?
+            </b-form-checkbox>
+          </b-form-group>
+          <b-button type="submit" variant="outline-success">Update</b-button>
+          <b-button type="reset" variant="outline-primary">Cancel</b-button>
         </b-form>
       </b-modal>
     </div>
@@ -72,7 +105,14 @@ export default {
         deadline: "",
         completed: [],
       },
+      editTaskForm: {
+        id: "",
+        task: "",
+        deadline: "",
+        completed: [],
+      },
       addTaskModal: false,
+      editTaskModal: false,
       tableFields: [
         { key: "task", label: "Task" },
         { key: "deadline", label: "Deadline" },
@@ -95,13 +135,13 @@ export default {
         });
     },
     // POST function
-    addTask(payLoad) {
+    addTask(payload) {
       const path = "http://localhost:5000/tasks";
       axios
-        .post(path, payLoad)
+        .post(path, payload)
         .then(() => {
           this.getTasks();
-          this.addTaskModal = false; // Close the modal
+          this.addTaskModal = false;
           this.initForm();
         })
         .catch((err) => {
@@ -129,8 +169,58 @@ export default {
     showAddTaskModal() {
       this.addTaskModal = true;
     },
-    onReset() {
+    onReset(e) {
+      e.preventDefault();
       this.initForm();
+    },
+    // Edit Task Modal
+    editTask(task) {
+      this.editTaskForm.id = task.id;
+      this.editTaskForm.task = task.task;
+      this.editTaskForm.deadline = task.deadline;
+      this.editTaskForm.completed = task.completed ? ["true"] : [];
+      this.editTaskModal = true;
+    },
+    onSubmitUpdate(e) {
+      e.preventDefault();
+      let completed = false;
+      if (this.editTaskForm.completed.includes("true")) {
+        completed = true;
+      }
+      const payload = {
+        task: this.editTaskForm.task,
+        deadline: this.editTaskForm.deadline,
+        completed: completed,
+      };
+      this.updateTask(payload, this.editTaskForm.id);
+    },
+    onResetUpdate(e) {
+      e.preventDefault();
+      this.editTaskModal = false;
+    },
+    updateTask(payload, taskId) {
+      const path = `http://localhost:5000/tasks/${taskId}`;
+      axios
+        .put(path, payload)
+        .then(() => {
+          this.getTasks();
+          this.editTaskModal = false;
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    },
+    // Delete Task
+    deleteTask(taskId) {
+      const path = `http://localhost:5000/tasks/${taskId}`;
+      axios
+        .delete(path, { withCredentials: true })
+        .then(() => {
+          this.getTasks();
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     },
   },
   created() {
