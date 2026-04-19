@@ -94,7 +94,27 @@
 </template>
 
 <script>
-import axios from "axios";
+const STORAGE_KEY = "todolist.tasks";
+
+function loadTasks() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveTasks(tasks) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+}
+
+function newId() {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
 
 export default {
   data() {
@@ -122,31 +142,16 @@ export default {
     };
   },
   methods: {
-    // GET function
     getTasks() {
-      const path = "http://localhost:5000/tasks";
-      axios
-        .get(path)
-        .then((res) => {
-          this.tasks = res.data.tasks;
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+      this.tasks = loadTasks();
     },
-    // POST function
     addTask(payload) {
-      const path = "http://localhost:5000/tasks";
-      axios
-        .post(path, payload)
-        .then(() => {
-          this.getTasks();
-          this.addTaskModal = false;
-          this.initForm();
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+      const tasks = loadTasks();
+      tasks.push({ id: newId(), ...payload });
+      saveTasks(tasks);
+      this.getTasks();
+      this.addTaskModal = false;
+      this.initForm();
     },
     initForm() {
       this.addTaskForm.task = "";
@@ -155,16 +160,12 @@ export default {
     },
     onSubmit(e) {
       e.preventDefault();
-      let completed = false;
-      if (this.addTaskForm.completed.includes("true")) {
-        completed = true;
-      }
-      const payload = {
+      const completed = this.addTaskForm.completed.includes("true");
+      this.addTask({
         task: this.addTaskForm.task,
         deadline: this.addTaskForm.deadline,
-        completed: completed,
-      };
-      this.addTask(payload);
+        completed,
+      });
     },
     showAddTaskModal() {
       this.addTaskModal = true;
@@ -173,7 +174,6 @@ export default {
       e.preventDefault();
       this.initForm();
     },
-    // Edit Task Modal
     editTask(task) {
       this.editTaskForm.id = task.id;
       this.editTaskForm.task = task.task;
@@ -183,44 +183,32 @@ export default {
     },
     onSubmitUpdate(e) {
       e.preventDefault();
-      let completed = false;
-      if (this.editTaskForm.completed.includes("true")) {
-        completed = true;
-      }
-      const payload = {
-        task: this.editTaskForm.task,
-        deadline: this.editTaskForm.deadline,
-        completed: completed,
-      };
-      this.updateTask(payload, this.editTaskForm.id);
+      const completed = this.editTaskForm.completed.includes("true");
+      this.updateTask(
+        {
+          task: this.editTaskForm.task,
+          deadline: this.editTaskForm.deadline,
+          completed,
+        },
+        this.editTaskForm.id
+      );
     },
     onResetUpdate(e) {
       e.preventDefault();
       this.editTaskModal = false;
     },
     updateTask(payload, taskId) {
-      const path = `http://localhost:5000/tasks/${taskId}`;
-      axios
-        .put(path, payload)
-        .then(() => {
-          this.getTasks();
-          this.editTaskModal = false;
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+      const tasks = loadTasks().map((t) =>
+        t.id === taskId ? { id: taskId, ...payload } : t
+      );
+      saveTasks(tasks);
+      this.getTasks();
+      this.editTaskModal = false;
     },
-    // Delete Task
     deleteTask(taskId) {
-      const path = `http://localhost:5000/tasks/${taskId}`;
-      axios
-        .delete(path, { withCredentials: true })
-        .then(() => {
-          this.getTasks();
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+      const tasks = loadTasks().filter((t) => t.id !== taskId);
+      saveTasks(tasks);
+      this.getTasks();
     },
   },
   created() {

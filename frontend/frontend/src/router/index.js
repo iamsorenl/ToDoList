@@ -4,14 +4,14 @@ import ToDoList from "../components/ToDoList.vue";
 
 const routes = [
   {
+    path: "/",
+    name: "ToDoList",
+    component: ToDoList,
+  },
+  {
     path: "/shark",
     name: "Shark",
     component: Shark,
-  },
-  {
-    path: "/ToDoList",
-    name: "ToDoList",
-    component: ToDoList,
   },
 ];
 

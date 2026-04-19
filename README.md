@@ -1,58 +1,52 @@
 # To Do List
 
-This project is a simple To-Do List application built using Vue.js and Flask, demonstrating the integration of a frontend JavaScript framework (Vue.js) with a backend Python framework (Flask). Users can add, edit, mark as completed, and delete tasks, with all data being stored on the server. The project includes CORS (Cross-Origin Resource Sharing) configuration to handle requests from different origins.
+A simple task list built with Vue 3 + Bootstrap-Vue. Add, edit, complete, and delete tasks.
 
-## Technologies Used
+**Live:** https://iamsorenl.github.io/ToDoList/
 
-- Vue.js: A progressive JavaScript framework for building user interfaces.
-- Flask (Python): A micro web framework for backend development.
-- Axios: A promise-based HTTP client for making API requests.
-- CORS: A middleware for handling Cross-Origin Resource Sharing in Flask.
-- HTML and CSS: For building the user interface.
+## Storage
 
-## Getting Started
+The live site persists tasks in the browser's `localStorage`, so your list is
+scoped to the device/browser you're using — no login, no server, no sync.
 
-### Requirements
+A Flask backend (`backend/main.py`) is kept in the repo as the original reference
+implementation for local dev. It stores tasks in an in-memory list and has the
+same CRUD semantics as the localStorage version. It is **not** used by the
+deployed site.
 
-Before you begin, ensure you have met the following requirements:
+## Run locally
 
-- **Python**: You will need Python 3.x to run the Flask backend. You can download it from [python.org](https://www.python.org/downloads/).
+### Frontend only (matches the live site)
 
-- **Node.js**: The Vue.js frontend is built with Node.js. You can download it from [nodejs.org](https://nodejs.org/).
+```bash
+cd frontend/frontend
+npm install
+npm run serve
+# → http://localhost:8080
+```
 
-- **npm (Node Package Manager)**: This is included with Node.js, so you should have npm installed after installing Node.js.
+### With the Flask backend
 
-To run this project locally on your machine, follow these steps:
+The Flask version is not wired to the current frontend; restore the axios calls
+in `src/components/ToDoList.vue` (see git history for the original) if you want
+to run against it.
 
-1. Clone this repository:
-   git clone https://github.com/your-username/ToDoList.git
+```bash
+cd backend
+pip install -r requirements.txt
+python main.py
+# → http://localhost:5000
+```
 
-2. Navigate to the project directory:
-   cd ToDoList
+## Deploy
 
-3. Initialize Flask Backend:
-   cd backend
-   python main.py
-
-4. Initialize Vue.js Frontend:
-   cd frontend/frontend
-   npm run serve
-
-5. Open your web browser and http://localhost:8080/ToDoList to see the application
-
-## Features
-
-- Add new tasks with deadlines.
-- Edit task details and deadlines.
-- Mark tasks as completed.
-- Delete tasks from the list.
-- Seamless communication between Vue.js frontend and Flask backend.
-- Demonstrates CORS configuration for handling cross-origin requests.
-- Minimalistic and responsive user interface.
+On every push to `main`, `.github/workflows/deploy.yml` runs
+`npm run build` inside `frontend/frontend/` and publishes `dist/` to GitHub
+Pages. `publicPath` in `vue.config.js` is set to `/ToDoList/` for production
+so asset URLs resolve under the repo subpath, and a `404.html` copy of
+`index.html` is generated so deep links (e.g. `/ToDoList/shark`) don't break.
 
 ## Contact
 
-If you have any questions or inquiries, feel free to reach out to me:
-
 - Email: iamsorenl@gmail.com
-- LinkedIn: Your LinkedIn Profile (https://www.linkedin.com/in/soren-larsen-46a57118b/)
+- LinkedIn: https://www.linkedin.com/in/soren-larsen-46a57118b/
