@@ -1,6 +1,6 @@
 # To Do List
 
-A simple task list built with Vue 3 + Bootstrap-Vue. Add, edit, complete, and delete tasks.
+A simple task list built with Vue 3 + Vite + BootstrapVueNext. Add, edit, complete, and delete tasks.
 
 **Live:** https://iamsorenl.github.io/ToDoList/
 
@@ -22,7 +22,7 @@ deployed site.
 cd frontend/frontend
 npm install
 npm run serve
-# → http://localhost:8080
+# → http://localhost:5173
 ```
 
 ### With the Flask backend
